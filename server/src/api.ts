@@ -1,23 +1,11 @@
 import express from "express";
-import { Connection } from "@solana/web3.js";
-import { cluster, url, urlTls } from "./urls";
-import { PROGRAM_ID } from "./program";
-import TpuProxy from "./tpu_proxy";
-import WebSocketServer from "./websocket";
 import http from "http";
+import pixelArtLibrary from "./pixelArtLibrary";
 
 export default class ApiServer {
   static async start(app: express.Application, httpServer: http.Server): Promise<void> {
-    const connection = new Connection(url, "confirmed");
-    const tpuProxy = await TpuProxy.create(connection);
-    WebSocketServer.start(httpServer, tpuProxy);
-
-    await tpuProxy.connect();
-
-    const programId = PROGRAM_ID?.toBase58();
-    if (!programId) {
-      throw new Error("Internal error: program id is missing");
-    }
+    // Add pixel art library endpoint
+    app.use(pixelArtLibrary);
 
     app.use(express.json()); // Ensure JSON body parsing
 
@@ -25,9 +13,6 @@ export default class ApiServer {
       res
         .send(
           JSON.stringify({
-            programId,
-            clusterUrl: urlTls,
-            cluster,
             paymentRequired: process.env.REQUIRE_PAYMENT === "true",
           })
         )

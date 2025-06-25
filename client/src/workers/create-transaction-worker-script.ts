@@ -1,80 +1,25 @@
-import {
-  Transaction,
-  PublicKey,
-  Keypair,
-  ComputeBudgetProgram,
-} from "@solana/web3.js";
-import * as Bytes from "utils/bytes";
-import { CreateTransactionMessage } from "./create-transaction-rpc";
+import { Transaction, Keypair, PublicKey } from "@solana/web3.js";
+
+// This worker now only creates Memo transactions for pixel changes
 
 const self: any = globalThis;
 
-function createTransaction(message: CreateTransactionMessage) {
-  const {
-    trackingId,
-    blockhash,
-    programId,
-    bitId,
-    feeAccountSecretKey,
-    programDataAccount,
-    computeUnitPrice,
-    extraWriteAccount,
-  } = message;
-
-  const transaction = new Transaction();
-  if (computeUnitPrice) {
-    const units = 1000;
-    const MICRO_LAMPORTS_PER_LAMPORT = 1_000_000;
-    const additionalFee = Math.ceil(
-      (computeUnitPrice * units) / MICRO_LAMPORTS_PER_LAMPORT
-    );
-    transaction.add(
-      ComputeBudgetProgram.requestUnits({
-        units,
-        additionalFee,
-      })
-    );
-  }
-  const breakAccountInputs = [
-    {
-      pubkey: new PublicKey(programDataAccount),
-      isWritable: true,
-      isSigner: false,
-    },
-  ];
-  if (extraWriteAccount) {
-    breakAccountInputs.push({
-      pubkey: new PublicKey(extraWriteAccount),
-      isWritable: true,
-      isSigner: false,
-    });
-  }
-  transaction.add({
-    keys: breakAccountInputs,
-    programId: new PublicKey(programId),
-    data: Buffer.from(Bytes.instructionDataFromId(bitId)),
-  });
-  transaction.recentBlockhash = blockhash;
-  transaction.sign(Keypair.fromSecretKey(feeAccountSecretKey));
-
-  const signatureBuffer = transaction.signature;
-
-  self.postMessage({
-    trackingId: trackingId,
-    signature: signatureBuffer,
-    serializedTransaction: transaction.serialize(),
-  });
-}
-
-self.onmessage = (event: any) => {
-  const message = event.data;
-
+self.onmessage = function (event: MessageEvent) {
+  const { trackingId, blockhash, payerSecretKey, memo } = event.data;
   try {
-    createTransaction(message);
-  } catch (error) {
-    self.postMessage({
-      trackingId: message.trackingId,
-      error: error,
+    const payer = Keypair.fromSecretKey(new Uint8Array(payerSecretKey));
+    const transaction = new Transaction();
+    transaction.add({
+      keys: [],
+      programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+      data: Buffer.from(memo),
     });
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = payer.publicKey;
+    transaction.sign(payer);
+    self.postMessage({ trackingId, transaction: transaction.serialize() });
+  } catch (error) {
+    let message = (error instanceof Error) ? error.message : String(error);
+    self.postMessage({ trackingId, error: message });
   }
 };
