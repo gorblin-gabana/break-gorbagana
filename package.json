@@ -19,5 +19,12 @@
     "format": "./package.sh both run format",
     "format:fix": "./package.sh both run format:fix",
     "postinstall": "./package.sh both install"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }

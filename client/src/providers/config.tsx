@@ -22,6 +22,7 @@ const DEFAULT_CONFIG: ClientConfig = {
   autoSendTransactions: false,
   countdownSeconds: 15,
   useTpu: false,
+  rpcUrl: "https://rpc.gorbchain.xyz", // updated to gorbagana RPC
 };
 
 type SetConfig = React.Dispatch<React.SetStateAction<ClientConfig>>;

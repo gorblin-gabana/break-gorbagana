@@ -23,7 +23,7 @@ export function configFromInit(response: any): Config {
   const cluster = stringToCluster(response.cluster);
   return {
     cluster,
-    rpcUrl: response.clusterUrl,
+    rpcUrl: response.clusterUrl || "https://rpc.gorbchain.xyz", // fallback to gorbagana RPC
     programId: new PublicKey(response.programId),
     airdropEnabled: !response.paymentRequired,
   };
