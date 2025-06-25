@@ -1,138 +1,99 @@
-## Break Gorbagana Game)
+# Gorbagana Pixel Art Grid Game
 
-### How it works
+## What is this?
 
-The Break Gorbagana Game consists of a 3 parts: a web client frontend, a web server backend, and an on-chain Gorbagana program. The web server backend
-is not strictly required but it helps with certain performance improvements.
+Gorbagana is a fully open-source, community-first pixel art grid game and NFT creator, built for the Gorbagana blockchain and powered by the $GOR token. Players can draw pixel art on a shared grid, mint their creations as OGOR NFTs, and show their support as early believers in Gorbagana. All transactions and game actions use a locally created wallet, allowing users to experiment and play directly on mainnet to test the network and its levels.
 
-At a basic level, the Break Gorbagana Game allows a player to send simple smart contract transactions as fast as they can to showcase Gorbagana's speed.
-The web frontend is responsible for creating, sending, and confirming transactions and displays the status of each transaction in a colored grid.
-The web backend helps out by acting as a fast relay for transactions. It will forward transactions directly to the TPU (transaction processing unit)
-UDP port of the current cluster leader node (typically transactions are first sent to an RPC API node for forwarding). It also helps by creating a
-supply of game accounts ahead of time to speed up game setup time (these accounts can be tracked across server restarts using Redis).
+## How it works
 
-Rather than subscribing to each transaction signature, the web client subscribes to account data updates. Each transaction will set a bit in the state
-within a Break program account, so each transaction can be uniquely identified by the bit it sets.
+The Gorbagana Pixel Art Game consists of three parts: a web client frontend, a web server backend, and an on-chain Gorbagana program. The backend is optional but helps with performance and account management.
 
-### Prerequisites
+- **Draw and Mint:** Players draw pixel art on a grid. Each pixel change is a transaction on Gorbagana, using $GOR for fees.
+- **OGOR NFTs:** Mint your pixel art as an OGOR NFT to prove you were an early supporter and creator in the Gorbagana community.
+- **Wallet:** A local wallet is created for each player, making it easy to play and test on mainnet.
+- **Open Source:** Everything is open source and built for the community, by the community.
 
-Solana CLI Tooling: https://docs.solana.com/cli/install-solana-cli-tools
-For running this application you need to have [NodeJs](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
-We recommend to use [NVM](https://github.com/creationix/nvm) for managing NodeJs versions
-For NVM installation please refer to [manual](https://github.com/creationix/nvm#install--update-script)
+The backend relays transactions directly to the Gorbagana network for speed, and can pre-create game accounts to improve setup time. The client subscribes to account data updates to reflect the grid state in real time.
 
-### Install
+## Prerequisites
+
+- Gorbagana CLI Tooling (coming soon)
+- [NodeJs](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/)
+- [NVM](https://github.com/creationix/nvm) recommended for NodeJs version management
+
+## Install
 
 ```
 npm install
 ```
 
-#### Configuration
+## Configuration
 
-By default, the Break server will connect to a local node for RPC. To configure this behavior, set the following environment variables when running the server:
+By default, the Gorbagana server connects to a local node for RPC. You can configure it with these environment variables:
 
-##### `PORT`
-
-Set this option to specify the port for the API server. Default is 8080.
-
+### `PORT`
+Set the API server port (default: 8080):
 ```
 PORT=80 npm run start:dev
 ```
 
-##### `RPC_URL`
-
-Set this option to connect to a specific remote RPC API server.
-
+### `RPC_URL`
+Connect to a specific Gorbagana RPC node:
 ```
 RPC_URL=http://rpc.gorbchain.xyz npm run start:dev
 ```
 
-##### `LIVE`
-
-Enable this option to connect to a remote cluster. The default cluster is devnet.
-
+### `LIVE`
+Connect to a remote cluster (default: devnet):
 ```
 LIVE=true npm run start:dev
 ```
 
-##### `DEPLOYED_PROGRAM_ADDRESS`
-
-Set this option to use an existing loaded Break Gorbagana program rather than load a new version.  If the program doesn't exist, the server will exit with an error.
-
+### `DEPLOYED_PROGRAM_ADDRESS`
+Use an existing loaded Gorbagana program (otherwise, the server will exit if not found):
 ```
 DEPLOYED_PROGRAM_ADDRESS=<BASE58 ENCODED ADDRESS> npm run start:dev
 ```
 
-To use the Break Gorbagana program that's used on https://break.gorbchain.xyz, use the following address:
+To use the Gorbagana program deployed at https://break.gorbchain.xyz:
 ```
 DEPLOYED_PROGRAM_ADDRESS=BrEAK7zGZ6dM71zUDACDqJnekihmwF15noTddWTsknjC npm run start:dev
 ```
 
-##### `SEND_TO_RPC`
-
-Enable this option to send transactions to the RPC API rather than directly to a validator TPU port.
-
+### `SEND_TO_RPC`
+Send transactions to the RPC API instead of directly to a validator:
 ```
 SEND_TO_RPC=true npm run start:dev
 ```
 
-### Run Client
+## Run Client
 
 ```
 cd client
 npm run start
 ```
 
-#### Configuration
+### Client Configuration
 
-Client behavior can be modified with the usage of url parameters.
+You can modify client behavior with URL parameters:
 
-##### `cluster`
+- `cluster`: Select a remote cluster (e.g. `mainnet`)
+- `commitment`: Set transaction confirmation level (`confirmed` or `processed`)
+- `debug`: Enable debug mode to show confirmation times
+- `retry`: Disable transaction retrying (`retry=disabled`)
+- `split`: Split transactions for parallelization (`split=1`)
+- `test`: Enable test mode for high TPS (`test`)
 
-Set this parameter to pick a remote cluster. This parameter is automatically set when using the UI cluster selector.
-
+Example:
 ```
-https://break.gorbchain.xyz/game?cluster=mainnet
-```
-
-##### `commitment`
-
-Set this parameter to set the commitment level used for confirming transactions. Default is `'confirmed'` but `'processed'`
-is also supported.
-
-```
-https://break.gorbchain.xyz/game?commitment=processed
+https://break.gorbchain.xyz/game?cluster=mainnet&commitment=processed&debug&split=1&test
 ```
 
-##### `debug`
+## Why Gorbagana?
 
-Set this parameter to enable "debug mode" which will display a table of confirmation times instead of the colored grid.
+- **For the Community:** 100% open source, built for and by Gorbagana believers.
+- **OGOR NFTs:** Mint your pixel art as a badge of early support.
+- **$GOR Token:** All fees and actions use $GOR, the native token of Gorbagana.
+- **Mainnet Ready:** Play, test, and create directly on mainnet with your own local wallet.
 
-```
-https://break.gorbchain.xyz/game?debug
-```
-
-##### `retry`
-
-Set this parameter to disable retrying transactions which have not yet been confirmed. Retry behavior is enabled by default because
-some transactions will be forwarded to a leader who skips their block slot.
-
-```
-https://break.gorbchain.xyz/game?retry=disabled
-```
-
-##### `split`
-
-Set this parameter to split transactions across multiple payer and program accounts to increase transaction parallelization. Default is 4.
-
-```
-https://break.gorbchain.xyz/game?split=1
-```
-
-##### `test`
-
-Set this parameter to enable "test mode" which will automatically send approximately 33 transactions per second.
-
-```
-https://break.gorbchain.xyz/game?test
-```
+Join us, draw your OGOR, and help build the Gorbagana legacy!

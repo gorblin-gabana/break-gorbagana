@@ -1,8 +1,7 @@
 import * as React from "react";
-import { Redirect, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { TransactionContainer } from "components/TxContainer";
-import { TransactionModal } from "components/TxModal";
+import PixelGridCanvas from "components/PixelGridCanvas";
 import {
   useTps,
   useCreatedCount,
@@ -20,24 +19,36 @@ export function GamePage() {
   const showStats = gameStatus === "play" || countdownStart !== undefined;
   const payer = useWalletState().wallet;
   const location = useLocation();
+  const navigate = useNavigate();
 
   if (showSetup) {
     if (!payer) {
-      return <Redirect to={{ ...location, pathname: "/wallet" }} />;
+      navigate("/wallet");
+      return null;
     } else {
-      return <Redirect to={{ ...location, pathname: "/start" }} />;
+      navigate("/start");
+      return null;
     }
+  }
+
+  function handleMint(pixels: number[][]) {
+    // TODO: send pixel data to backend for NFT minting
+    alert("Minting NFT with your pixel art! (Backend integration needed)");
   }
 
   return (
     <div className="container-fluid d-flex flex-fill flex-column my-4 min-width-0">
       {showStats && <Stats />}
-      <div className="row flex-grow-1">
-        <div className="col">
-          <TransactionContainer enabled />
+      <div className="row flex-grow-1 justify-content-center align-items-center">
+        <div className="col-md-8 d-flex justify-content-end">
+          {/* Right panel: Pixel grid game */}
+          <PixelGridCanvas onMint={handleMint} />
+        </div>
+        <div className="col-md-4 d-flex flex-column align-items-center justify-content-center">
+          {/* Left panel: Color picker and pen */}
+          {/* The color picker is now part of PixelGridCanvas for simplicity */}
         </div>
       </div>
-      <TransactionModal />
     </div>
   );
 }
