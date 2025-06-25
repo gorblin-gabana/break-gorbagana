@@ -33,7 +33,7 @@ const rootPath = path.join(__dirname, "..", "..");
 const staticPath = path.join(rootPath, "client", "build");
 console.log(`Serving static files from: ${staticPath}`);
 app.use("/", express.static(staticPath));
-app.get("/*", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(staticPath, "/index.html"));
 });
 

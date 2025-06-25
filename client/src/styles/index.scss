@@ -1,11 +1,10 @@
+// Bootstrap functions must be first for theme-color and other helpers
+@import "~bootstrap/scss/functions.scss";
+// Custom variables must be second so all variables are defined before use
+@import "custom-variables";
+
 // Icon font
 @import "../fonts/feather/feather";
-
-// Bootstrap functions
-@import "~bootstrap/scss/functions.scss";
-
-// Custom variables
-@import "custom-variables";
 
 // Dark mode variables
 @import "dashkit/dark/variables-dark";
